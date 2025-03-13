@@ -1,5 +1,5 @@
 import { fileURLToPath, URL } from "node:url";
-import { defineConfig, loadEnv } from "vite";
+import { build, defineConfig, loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import Components from "unplugin-vue-components/vite";
@@ -13,6 +13,9 @@ import { enableCDN } from "./build/cdn";
 
 // 当前工作目录路径
 const root: string = process.cwd();
+
+// const outerUrl = "http://192.168.1.2:9001";
+const outerUrl = "http://47.116.170.1";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -59,8 +62,17 @@ export default defineConfig(({ mode }) => {
       // 仅在 proxy 中配置的代理前缀， mock-dev-server 才会拦截并 mock
       // doc: https://github.com/pengzhanbo/vite-plugin-mock-dev-server
       proxy: {
-        "^/dev-api": {
-          target: ""
+        // "^/dev-api": {
+        //   target: outerUrl
+        // }
+        "/admin/api": {
+          target: outerUrl,
+          pathRewrite: { "^/admin/api": "/api" }
+          // 日志级别
+        },
+        "/admin": {
+          changeOrigin: true,
+          target: outerUrl
         }
       }
     },

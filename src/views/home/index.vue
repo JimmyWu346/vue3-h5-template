@@ -1,10 +1,19 @@
 <script setup lang="ts">
 import { reactive } from "vue";
 import GridPatternDashed from "@/components/grid-pattern/grid-pattern-dashed.vue";
+import { useRouter } from "vue-router";
 
 defineOptions({
-  name: "Demo"
+  name: "Home"
 });
+
+const router = useRouter();
+
+const handleClick = () => {
+  console.log("handleClick");
+  router.push("/login");
+  // 可以在这里添加点击处理逻辑
+};
 
 const contentList = reactive([
   { text: "⚡ Vue3 + Vite5", fullWidth: false },
@@ -47,6 +56,9 @@ const contentList = reactive([
           <svg-icon class="text-[12px] ml-[5px]" name="link" />
         </a>
       </div>
+
+      <p @click="handleClick">{{ $t("message.hello") }}</p>
+
       <p class="leading-[24px] my-[6px]">
         🌱 基于 Vue3 全家桶、TypeScript、Vite 构建工具，开箱即用的 H5
         移动端项目基础模板

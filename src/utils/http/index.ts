@@ -4,20 +4,28 @@ import Axios, {
   type AxiosResponse,
   type AxiosRequestConfig
 } from "axios";
-import { ContentTypeEnum, ResultEnum } from "@/enums/request-enum";
+// import { ResultEnum } from "@/enums/request-enum"; // ContentTypeEnum,
 import NProgress from "../progress";
 import { showFailToast } from "vant";
 import "vant/es/toast/style";
-
+import { useUserStore } from "@/store/modules/user-info";
+import { useRouter } from "vue-router";
 // 默认 axios 实例请求配置
 const configDefault = {
-  headers: {
-    "Content-Type": ContentTypeEnum.FORM_URLENCODED
-  },
+  // headers: {
+  //   "Content-Type": ContentTypeEnum.FORM_URLENCODED
+  // },
   timeout: 0,
-  baseURL: import.meta.env.VITE_BASE_API,
+  baseURL: "admin",
   data: {}
 };
+
+// 设置默认前缀
+// const prefix = "admin";
+// axios.defaults.baseURL = prefix;
+// axios.defaults.headers.common["Accept-Language"] =
+//   localStorage.getItem("lang") || "en";
+// axios.defaults.timeout = 30000;
 
 class Http {
   // 当前实例
@@ -30,10 +38,12 @@ class Http {
     Http.axiosInstance.interceptors.request.use(
       config => {
         NProgress.start();
+        const userStore = useUserStore();
+
         // 发送请求前，可在此携带 token
-        // if (token) {
-        //   config.headers['token'] = token
-        // }
+        if (userStore.accessToken) {
+          config.headers["we-services-token"] = userStore.accessToken;
+        }
         return config;
       },
       (error: AxiosError) => {
@@ -49,15 +59,15 @@ class Http {
       (response: AxiosResponse) => {
         NProgress.done();
         // 与后端协定的返回字段
-        const { code, result } = response.data;
+        const { code } = response.data;
         // const { message } = response.data;
         // 判断请求是否成功
-        const isSuccess =
-          result &&
-          Reflect.has(response.data, "code") &&
-          code === ResultEnum.SUCCESS;
+        const isSuccess = code === 0;
+        // result &&
+        // Reflect.has(response.data, "code") &&
+        // code === ResultEnum.SUCCESS;
         if (isSuccess) {
-          return result;
+          return response.data;
         } else {
           // 处理请求错误
           // showFailToast(message);
@@ -109,6 +119,12 @@ class Http {
         }
 
         showFailToast(message);
+        // 跳转登录
+        if (status === 401) {
+          const router = useRouter();
+          router.push("/login"); // 使用编程式跳转
+        }
+
         return Promise.reject(error);
       }
     );
