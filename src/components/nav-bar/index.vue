@@ -1,37 +1,29 @@
 <script setup lang="ts">
-import {
-  useDarkMode,
-  useToggleDarkMode
-} from "@/composables/useToggleDarkMode";
-import { useI18n } from "vue-i18n";
+import { useRoute } from "vue-router"; // 导入 useRoute
+// 获取当前路由
+const route = useRoute(); // vue-router 的 route 对象
 
-const { locale } = useI18n();
-
-const onClickRight = (event: TouchEvent | MouseEvent) => {
-  useToggleDarkMode(event);
-};
-
-// 切换语言
-const toggleLanguage = () => {
-  locale.value = locale.value === "zh" ? "en" : "zh";
+const onClickLeft = () => {
+  history.back();
 };
 </script>
-
 <template>
-  <van-nav-bar fixed placeholder @click-right="onClickRight">
-    <template #right>
-      <!-- 语言切换按钮 -->
-      <div class="flex items-center gap-4">
-        <span class="cursor-pointer text-[14px]" @click.stop="toggleLanguage">
-          {{ locale === "zh" ? "中" : "En" }}
-        </span>
-        <svg-icon
-          class="text-[18px]"
-          :name="useDarkMode() ? 'light' : 'dark'"
-        />
-      </div>
-    </template>
-  </van-nav-bar>
+  <van-nav-bar
+    fixed
+    z-index="8"
+    placeholder
+    :title="route.query?.navTitle as string"
+    left-arrow
+    @click-left="onClickLeft"
+  />
 </template>
 
-<style scoped></style>
+<style lang="less" scoped>
+:deep(.van-nav-bar__arrow) {
+  color: #231e1c;
+  font-weight: bold;
+}
+:deep(::v-deep .van-nav-bar__content) {
+  height: 64px;
+}
+</style>

@@ -9,7 +9,8 @@ import NProgress from "../progress";
 import { showFailToast } from "vant";
 import "vant/es/toast/style";
 import { useUserStore } from "@/store/modules/user-info";
-import { useRouter } from "vue-router";
+// import { useRouter } from "vue-router";
+
 // 默认 axios 实例请求配置
 const configDefault = {
   // headers: {
@@ -39,6 +40,7 @@ class Http {
       config => {
         NProgress.start();
         const userStore = useUserStore();
+        config.headers["accept-language"] = userStore.i18nLocale;
 
         // 发送请求前，可在此携带 token
         if (userStore.accessToken) {
@@ -77,52 +79,61 @@ class Http {
       (error: AxiosError) => {
         NProgress.done();
         // 处理 HTTP 网络错误
-        let message = "";
+        // let message = "";
         // HTTP 状态码
         const status = error.response?.status;
-        switch (status) {
-          case 400:
-            message = "请求错误";
-            break;
-          case 401:
-            message = "未授权，请登录";
-            break;
-          case 403:
-            message = "拒绝访问";
-            break;
-          case 404:
-            message = `请求地址出错: ${error.response?.config?.url}`;
-            break;
-          case 408:
-            message = "请求超时";
-            break;
-          case 500:
-            message = "服务器内部错误";
-            break;
-          case 501:
-            message = "服务未实现";
-            break;
-          case 502:
-            message = "网关错误";
-            break;
-          case 503:
-            message = "服务不可用";
-            break;
-          case 504:
-            message = "网关超时";
-            break;
-          case 505:
-            message = "HTTP版本不受支持";
-            break;
-          default:
-            message = "网络连接故障";
-        }
+        // switch (status) {
+        //   case 400:
+        //     message = "请求错误";
+        //     break;
+        //   case 401:
+        //     message = "未授权，请登录";
+        //     break;
+        //   case 403:
+        //     message = "拒绝访问";
+        //     break;
+        //   case 404:
+        //     message = `请求地址出错: ${error.response?.config?.url}`;
+        //     break;
+        //   case 408:
+        //     message = "请求超时";
+        //     break;
+        //   case 500:
+        //     message = "服务器内部错误";
+        //     break;
+        //   case 501:
+        //     message = "服务未实现";
+        //     break;
+        //   case 502:
+        //     message = "网关错误";
+        //     break;
+        //   case 503:
+        //     message = "服务不可用";
+        //     break;
+        //   case 504:
+        //     message = "网关超时";
+        //     break;
+        //   case 505:
+        //     message = "HTTP版本不受支持";
+        //     break;
+        //   default:
+        //     message = "网络连接故障";
+        // }
 
-        showFailToast(message);
+        // showFailToast({
+        //   message: (error.response.data as { msg: string }).msg,
+        //   wordBreak: "normal"
+        // });
+        showFailToast(
+          (error.response.data as { msg: string }).msg || "服务器无响应"
+        );
         // 跳转登录
         if (status === 401) {
-          const router = useRouter();
-          router.push("/login"); // 使用编程式跳转
+          const userStore = useUserStore();
+          userStore.clearLock();
+          // const router = useRouter();
+          // router.push("/login"); // 使用编程式跳转
+          window.location.href = "/login"; // 临时替代 router
         }
 
         return Promise.reject(error);

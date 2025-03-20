@@ -14,16 +14,29 @@ const routes: Array<RouteRecordRaw> = [
         name: "Home",
         component: Home,
         meta: {
-          title: "主页"
+          title: "home",
+          hideNavBar: false,
+          cachedViews: true
         }
       },
       {
-        path: "about",
-        name: "About",
-        component: () => import("@/views/about/index.vue"),
+        path: "me",
+        name: "Me",
+        component: () => import("@/views/me/index.vue"),
         meta: {
-          title: "关于",
+          title: "me",
+          hideNavBar: false,
           noCache: true
+        }
+      },
+      {
+        path: "detail",
+        name: "Detail",
+        component: () => import("@/views/detail/index.vue"),
+        meta: {
+          title: "detail",
+          noCache: true,
+          hiddenTabbar: true
         }
       }
     ]

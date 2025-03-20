@@ -14,14 +14,14 @@
         <input
           v-model="username"
           type="text"
-          placeholder="请输入账号"
+          :placeholder="$t('placeHolderUsername')"
           class="w-full px-4 py-3 border h-[53px] border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-orange-500 login-input"
         />
         <div class="relative">
           <input
             v-model="password"
             :type="showPassword ? 'text' : 'password'"
-            placeholder="请输入密码"
+            :placeholder="$t('placeHolderPwd')"
             class="w-full px-4 py-3 h-[53px] border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-orange-500 login-input"
           />
           <button
@@ -50,7 +50,7 @@
           color="#ff5722"
           @click="handleLogin"
         >
-          立即登錄
+          {{ $t("message.login") }}
         </van-button>
       </div>
     </div>
@@ -59,9 +59,11 @@
 
 <script setup>
 import { ref } from "vue";
-import { showToast } from "vant";
 import { useUserStore } from "@/store/modules/user-info";
 import { useRouter } from "vue-router";
+import { showToast } from "vant";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 const userStore = useUserStore();
 const username = ref("");
 const password = ref("");
@@ -73,19 +75,24 @@ const togglePassword = () => {
 };
 
 const handleLogin = async () => {
-  console.log("🚀 ~ handleLogin ~ async:");
+  if (!username.value || !password.value) {
+    showToast(t("loginRequired"));
+    return;
+  }
 
   await userStore.loginByUsernameAction({
     username: username.value,
     password: password.value
   });
 
+  showToast(t("showSuccessToast"));
+
   await userStore.getUserInfoAction();
   router.push("/home");
 };
 </script>
 
-<style scoped>
+<style lang="less" scoped>
 :root {
   --van-field-input-text-color: #333;
   --van-button-primary-background-color: #ff5722;

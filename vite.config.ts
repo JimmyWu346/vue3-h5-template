@@ -16,6 +16,7 @@ const root: string = process.cwd();
 
 // const outerUrl = "http://192.168.1.2:9001";
 const outerUrl = "http://47.116.170.1";
+// const outerUrl = "https://welcom.wegroupltd.net/";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {

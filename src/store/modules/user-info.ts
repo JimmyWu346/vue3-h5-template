@@ -1,7 +1,11 @@
 // src/store/modules/user.ts
 import { defineStore } from "pinia";
-import { loginByUsername, getUserInfo } from "@/api/login"; // 你自己的接口路径
+import { loginByUsername, getUserInfo, logout } from "@/api/login"; // 你自己的接口路径
 import { ref } from "vue";
+import { i18n } from "@/i18n"; // 如果你有 i18n 实例
+import { Locale } from "vant";
+// 引入英文语言包
+import enUS from "vant/es/locale/lang/en-US";
 
 export const useUserStore = defineStore(
   "user-info",
@@ -13,7 +17,18 @@ export const useUserStore = defineStore(
     const roles = ref<string[]>([]);
     const roleNames = ref<string[]>([]);
     const permissions = ref<string[]>([]);
-    const drawerOpenIdArr = ref<any[]>([]);
+    const i18nLocale = ref(localStorage.getItem("app-locale") || "zh");
+
+    function setLocal(locale: "zh" | "en") {
+      i18nLocale.value = locale;
+      i18n.global.locale.value = locale;
+      localStorage.setItem("app-locale", locale);
+      if (locale == "en") {
+        Locale.use("en-US", enUS);
+      } else {
+        Locale.use("zh-CN");
+      }
+    }
 
     // ✅ actions
     async function loginByUsernameAction(userInfoPayload: any) {
@@ -28,11 +43,23 @@ export const useUserStore = defineStore(
           const data = res.data;
           accessToken.value = data;
           refreshToken.value = data;
-          drawerOpenIdArr.value = [];
           resolve(data);
         } catch (err) {
           reject(err);
         }
+      });
+    }
+    async function LogOut() {
+      // 登出
+      return new Promise((resolve, reject) => {
+        logout()
+          .then(() => {
+            clearLock();
+            resolve(null);
+          })
+          .catch(error => {
+            reject(error);
+          });
       });
     }
 
@@ -40,7 +67,7 @@ export const useUserStore = defineStore(
       return new Promise(async (resolve, reject) => {
         try {
           const res = await getUserInfo();
-          const data = res.data.data || {};
+          const data = res.data || {};
           userInfo.value = data.sysUser;
           roles.value = data.roles || [];
           roleNames.value = data.roleNames || [];
@@ -53,7 +80,12 @@ export const useUserStore = defineStore(
     }
 
     function clearLock() {
-      // 原来 commit("CLEAR_LOCK") 的地方看逻辑需要做什么
+      userInfo.value = "";
+      roles.value = [];
+      roleNames.value = [];
+      permissions.value = [];
+      accessToken.value = "";
+      refreshToken.value = "";
     }
 
     return {
@@ -64,12 +96,15 @@ export const useUserStore = defineStore(
       roles,
       roleNames,
       permissions,
-      drawerOpenIdArr,
+      i18nLocale,
 
       // actions
       loginByUsernameAction,
+      LogOut,
       getUserInfoAction,
-      clearLock
+      clearLock,
+
+      setLocal
     };
   },
   {
