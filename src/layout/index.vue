@@ -21,23 +21,22 @@ const showNavBar = computed(() => {
 const showTabbar = computed(() => {
   return !route.meta.hiddenTabbar; // 默认值为 true，如果 meta 中未定义
 });
-console.log("🚀 ~ showTabbar ~ showTabbar:", route.meta.hiddenTabbar);
 // 要缓存的视图名称列表
-const cachedViews = ref(["Home"]);
+const cachedViews = ref(["Home", "Detail"]);
 // const cachedViews = ref([""]);
 </script>
 
 <template>
   <div class="app-wrapper">
-    <van-config-provider :theme="useDarkMode() ? 'dark' : 'light'">
-      <nav-bar v-show="showNavBar" />
-      <router-view v-slot="{ Component }">
-        <keep-alive :include="cachedViews">
-          <component :is="Component" />
-        </keep-alive>
-      </router-view>
-      <tabbar v-show="showTabbar" />
-    </van-config-provider>
+    <!-- <van-config-provider :theme="useDarkMode() ? 'dark' : 'light'"> -->
+    <nav-bar v-show="showNavBar" placeholder class="h-[46px]" />
+    <router-view v-slot="{ Component }">
+      <keep-alive :include="cachedViews">
+        <component :is="Component" />
+      </keep-alive>
+    </router-view>
+    <tabbar v-show="showTabbar" />
+    <!-- </van-config-provider> -->
   </div>
 </template>
 

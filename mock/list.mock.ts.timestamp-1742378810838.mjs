@@ -27,6 +27,4 @@ var list_mock_default = defineMock([
     }
   }
 ]);
-export {
-  list_mock_default as default
-};
+export { list_mock_default as default };

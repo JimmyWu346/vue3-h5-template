@@ -67,6 +67,7 @@ export default defineConfig(({ mode }) => {
         //   target: outerUrl
         // }
         "/admin/api": {
+          changeOrigin: true,
           target: outerUrl,
           pathRewrite: { "^/admin/api": "/api" }
           // 日志级别

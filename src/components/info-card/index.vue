@@ -2,7 +2,7 @@
   <div class="pt-[15px] px-[12px] pb-[20px] info-container">
     <!-- 标题 -->
     <div class="flex items-center">
-      <img :src="icon" class="w-[22px] h-[22px]" />
+      <img v-if="icon" :src="icon" class="w-[22px] h-[22px]" />
       <span class="ml-[7px] font-normal text-[#333333] title">{{ title }}</span>
     </div>
     <van-divider v-if="!noDivider" class="!mt-[8px] !mb-[10px]" />

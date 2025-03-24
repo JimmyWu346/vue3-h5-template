@@ -34,8 +34,19 @@ const routes: Array<RouteRecordRaw> = [
         name: "Detail",
         component: () => import("@/views/detail/index.vue"),
         meta: {
-          title: "detail",
+          title: "cDetail",
           noCache: true,
+          hiddenTabbar: true
+        }
+      },
+      {
+        path: "files",
+        name: "Files",
+        component: () => import("@/views/detail/index-file.vue"),
+        meta: {
+          title: "files",
+          noCache: true,
+          // hideNavBar: false,
           hiddenTabbar: true
         }
       }
@@ -46,7 +57,7 @@ const routes: Array<RouteRecordRaw> = [
     name: "Login",
     component: () => import("@/pages/login.vue"),
     meta: {
-      title: "登录",
+      title: "login",
       noCache: true
     }
   }

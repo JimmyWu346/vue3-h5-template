@@ -5,6 +5,8 @@ export default {
   },
   me: "Me",
   home: "Home",
+  cDetail: "Detail",
+  login: "Login",
   homePage: {
     search: "Search",
     noMore: "No more data",

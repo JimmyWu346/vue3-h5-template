@@ -8,15 +8,17 @@ import "./styles/index.less";
 import "./styles/tailwind.css";
 // svg icon
 import "virtual:svg-icons-register";
-import { initializeDarkMode } from "@/utils/dark-mode";
+// import { initializeDarkMode } from "@/utils/dark-mode";
 // 导入 i18n 实例
 import { i18n } from "./i18n";
 import App from "./App.vue";
 import router from "./router";
+import { ImagePreview } from "vant";
 
-initializeDarkMode();
+// initializeDarkMode();
 
 const app = createApp(App);
+app.use(ImagePreview);
 app.use(store);
 app.use(router);
 // 使用 i18n

@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen relative">
     <!-- 顶部背景 -->
-    <img src="@/assets/bg.png" class="h-[198px]" />
+    <img src="@/assets/bg.png" class="h-[198px] w-full" />
     <!-- 主体内容 -->
     <div class="absolute top-[156px] w-full">
       <!-- welcome -->
@@ -63,6 +63,12 @@ import { useUserStore } from "@/store/modules/user-info";
 import { useRouter } from "vue-router";
 import { showToast } from "vant";
 import { useI18n } from "vue-i18n";
+import { onMounted } from "vue";
+
+onMounted(() => {
+  document.body.style.backgroundColor = "white"; // 当前页面背景色
+});
+
 const { t } = useI18n();
 const userStore = useUserStore();
 const username = ref("");
@@ -86,12 +92,11 @@ const handleLogin = async () => {
   });
 
   showToast(t("showSuccessToast"));
-
   await userStore.getUserInfoAction();
+
   router.push("/home");
 };
 </script>
-
 <style lang="less" scoped>
 :root {
   --van-field-input-text-color: #333;

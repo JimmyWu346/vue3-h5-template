@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen relative main-container">
+  <div class="relative main-container">
     <!-- 顶部背景 -->
     <img src="@/assets/bg2.jpg" class="w-full h-[333px]" />
     <!-- 主体内容 -->
@@ -13,7 +13,7 @@
         class="flex justify-between px-5 py-3 bg-white rounded-md mt-8"
         @click="toggleLanguage"
       >
-        <span>{{ $t("language") }}</span>
+        <span>語言 / Language</span>
         <span class="text-[#A6A6A6]">{{ $t("languageNow") }}</span>
       </div>
       <!-- 按钮 -->
@@ -37,6 +37,12 @@ import { useRouter } from "vue-router";
 import { useUserStore } from "@/store/modules/user-info";
 import { showToast } from "vant";
 import { useI18n } from "vue-i18n";
+import { onMounted } from "vue";
+
+onMounted(() => {
+  document.body.style.backgroundColor = "#f7f8f9"; // 当前页面背景色
+});
+
 const { t } = useI18n();
 
 const router = useRouter();

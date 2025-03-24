@@ -67,8 +67,14 @@
 <script setup>
 import { useRouter } from "vue-router";
 import { companyFetchPage } from "@/api/common";
-import { reactive, ref, defineOptions } from "vue";
+import { reactive, ref } from "vue";
 import { useI18n } from "vue-i18n";
+
+import { onMounted } from "vue";
+
+onMounted(() => {
+  document.body.style.backgroundColor = "#f7f8f9"; // 当前页面背景色
+});
 
 defineOptions({
   name: "Home"
@@ -182,7 +188,6 @@ onLoad();
 }
 
 .main-container {
-  background-color: var(--color-background-2);
   height: 100%;
   min-height: 100vh;
   .item-block {

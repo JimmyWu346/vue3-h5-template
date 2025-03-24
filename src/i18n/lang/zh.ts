@@ -5,6 +5,8 @@ export default {
   },
   me: "我的",
   home: "首頁",
+  cDetail: "詳情",
+  login: "登錄",
   homePage: {
     search: "搜索",
     noMore: "沒有更多了",
@@ -19,11 +21,11 @@ export default {
   placeHolderPwd: "請輸入密碼",
   showSuccessToast: "操作成功",
   homeSearchPLH: "簡稱/中文名/英文名/股東/董事",
-  // 详情页翻译
+  // 詳情頁翻譯
   detail: {
     basicInfo: "公司基本信息",
-    attachmentList: "附件列表",
-    shareholderList: "股東列表",
+    attachmentList: "附件列錶",
+    shareholderList: "股東列錶",
     companyEnName: "公司英文名",
     companyChName: "公司中文名",
     companyAbbr: "公司簡稱",

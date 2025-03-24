@@ -11,7 +11,7 @@
       <!-- 主体内容 -->
       <van-tabs v-model:active="active" swipeable>
         <!-- 基本信息 -->
-        <!-- <van-tab :title="$t('detail.basicInfo')">
+        <van-tab :title="$t('detail.basicInfo')">
           <InfoCard
             class="mt-1"
             :title="$t('detail.basicInfo')"
@@ -99,19 +99,39 @@
               </van-col>
             </van-row>
           </InfoCard>
-        </van-tab> -->
+        </van-tab>
+
         <!-- 附件 -->
-        <!-- <van-tab :title="$t('detail.attachmentList')">
+        <van-tab :title="$t('detail.attachmentList')">
           <InfoCard
             class="mt-1"
             :title="$t('detail.attachmentList')"
             :icon="groupImg"
-          />
-        </van-tab> -->
+          >
+            <div
+              v-for="(i, k) in files"
+              :key="k"
+              class="flex justify-between items-center file-list-item"
+              @click="clickFile(i)"
+            >
+              <div class="w-[calc(100%-83px-20px)] flex items-center">
+                <FileIcon :fileName="i.name" :icon="i.icon" />
+                <span
+                  class="w-[calc(100%-28px)] truncate text-[#646A73FF] file-list-item__name ml-[3px]"
+                  >{{ i.name }}</span
+                >
+              </div>
+              <div class="w-[83px] text-[#A6A6A6] file-list-item__time">
+                {{ i.time && i.time.substring(0, 16) }}
+              </div>
+            </div>
+          </InfoCard>
+        </van-tab>
+
         <!-- 成员 -->
         <van-tab :title="$t('detail.shareholderList')">
           <InfoCard
-            class="mt-1"
+            class="mt-1 pb-2"
             title="股东/成员列表"
             :icon="shareholderImg"
             noDividersdfs
@@ -167,7 +187,12 @@
             <!-- 董事列表 -->
             <InfoCardSub title="董事列表">
               <van-row :gutter="[10, 10]">
-                <van-col v-for="(i, k) in director" :key="k" span="24">
+                <van-col
+                  v-for="(i, k) in director"
+                  :key="k"
+                  class="!mb-[10px]"
+                  span="24"
+                >
                   <TextCardNotText class="grid grid-cols-[65%_35%] gap-[7px]">
                     <TextCardNotText_Text title="姓名" :content="i.name" />
                     <TextCardNotText_Text
@@ -197,8 +222,13 @@
             <!-- 授權代表 -->
             <InfoCardSub title="授權代表">
               <van-row :gutter="[10, 10]">
-                <van-col v-for="(i, k) in director" :key="k" span="24">
-                  <TextCardNotText class="grid grid-cols-[65%_35%] gap-[7px]">
+                <van-col
+                  v-for="(i, k) in director"
+                  :key="k"
+                  class="!mb-[10px]"
+                  span="24"
+                >
+                  <TextCardNotText class="grid grid-cols-[100%_35%] gap-[7px]">
                     <TextCardNotText_Text title="姓名" :content="i.name" />
                   </TextCardNotText>
                 </van-col>
@@ -216,9 +246,86 @@
             </InfoCardSub>
 
             <!-- 最終受益人 -->
+            <InfoCardSub title="最終受益人">
+              <template #title-right>
+                <div class="ml-[2px]" @click="togglerName">
+                  <img
+                    v-show="showBeneficiaryName"
+                    class="h-[17px] w-[17px]"
+                    src="@/assets/pwd-view.png"
+                  />
+                  <img
+                    v-show="!showBeneficiaryName"
+                    class="h-[17px] w-[17px]"
+                    src="@/assets/pwd-close.png"
+                  />
+                </div>
+              </template>
+              <van-row :gutter="[10, 10]">
+                <van-col
+                  v-for="(i, k) in beneficiary"
+                  :key="k"
+                  class="!mb-[10px]"
+                  span="24"
+                >
+                  <TextCardNotText class="grid grid-cols-[100%_35%] gap-[7px]">
+                    <TextCardNotText_Text
+                      title="姓名"
+                      :content="showBeneficiaryName ? i.name : '****'"
+                    />
+                  </TextCardNotText>
+                </van-col>
+
+                <van-col span="24">
+                  <p
+                    v-if="shareholder.length < 1"
+                    class="text-[#646A73] text-[11px] text-center"
+                  >
+                    无数据
+                  </p>
+                </van-col>
+              </van-row>
+            </InfoCardSub>
           </InfoCard>
         </van-tab>
       </van-tabs>
+      <!-- 成员__输入框 -->
+      <van-dialog
+        v-if="showBeneficiaryInput"
+        v-model:show="showBeneficiaryInput"
+        title="确认密码"
+        show-cancel-button
+        show-confirm-button
+        confirmButtonColor="#"
+      >
+        <input
+          v-model="password"
+          :type="showPassword ? 'text' : 'password'"
+          :placeholder="$t('placeHolderPwd')"
+          class="w-full px-4 py-3 h-[53px] border-gray-200 focus:outline-none border-t-[0.5px] border-b-[0.5px] border-t-[#ff58331a] border-b-[#ff58331a]"
+        />
+
+        <template v-slot:footer>
+          <div class="flex justify-between">
+            <van-button
+              block
+              plain
+              type="primary !border-0 "
+              color="gray"
+              @click="cancelDialog"
+              >取消</van-button
+            >
+            <van-button
+              block
+              plain
+              type="success !border-0 "
+              color="#ff5733"
+              @click="checkOutUserPwd"
+              >确认</van-button
+            >
+          </div>
+        </template>
+      </van-dialog>
     </div>
   </van-pull-refresh>
 </template>
@@ -229,17 +336,39 @@ import { reactive, ref } from "vue";
 import InfoCard from "@/components/info-card/index.vue";
 import InfoCardSub from "@/components/info-card/index-sub.vue";
 import TextCardNotText from "@/components/text-card/index-not-text.vue";
+import FileIcon from "@/components/file-icon/index.vue";
 import TextCardNotText_Text from "@/components/text-card/index-not-text__text.vue";
 import groupImg from "@/assets/detail/group.png";
 import shareholderImg from "@/assets/detail/shareholder.png";
 import infoImg from "@/assets/detail/info.png";
 import { http } from "@/utils/http";
+import { useI18n } from "vue-i18n";
+import { showToast } from "vant";
+import { useUserStore } from "@/store/modules/user-info";
+import { loginByUsername } from "@/api/login"; // 你自己的接口路径
+import { onMounted } from "vue";
+import { iconFileType } from "./file";
+import { showImagePreview } from "vant";
 
+defineOptions({
+  name: "Detail"
+});
+
+onMounted(() => {
+  document.body.style.backgroundColor = "#f7f8f9"; // 当前页面背景色
+});
+
+const { t } = useI18n();
 const router = useRouter();
+const userStore = useUserStore();
 const route = useRoute();
 const loading = ref(false);
 const pullLoading = ref(false);
 const active = ref("");
+const showBeneficiaryName = ref(false);
+const showBeneficiaryInput = ref(false);
+const password = ref("");
+const showPassword = ref(false);
 const id = route.query.id;
 
 const companyInfo = reactive({});
@@ -249,8 +378,10 @@ const shareholder = reactive([]);
 const director = reactive([]);
 // 授权人
 const authorized = reactive([]);
-// 控制人
+// 最终受益人
 const beneficiary = reactive([]);
+// 文件
+const files = reactive([]);
 
 const pullOnLoad = async () => {
   pullLoading.value = true;
@@ -275,6 +406,17 @@ const onLoad = async () => {
     http.request({
       url: `/company/beneficiary/list?companyId=${id}`,
       method: "get"
+    }),
+    http.request({
+      url: `/api/storage/files`,
+      method: "post",
+      data: {
+        storageKey: "1",
+        password: "",
+        companyId: id,
+        orderBy: "name",
+        orderDirection: "asc"
+      }
     })
   ];
 
@@ -305,6 +447,15 @@ const onLoad = async () => {
             beneficiary.splice(0, beneficiary.length, ...data);
             console.log("✅ beneficiary:", data);
             break;
+          case 5:
+            files.splice(0, files.length, ...data.files);
+
+            files.forEach(item => {
+              item["icon"] = getFileIconName(item);
+            });
+
+            console.log("✅ files:", data);
+            break;
         }
       } else {
         console.error(`❌ 第 ${index + 1} 个请求失败:`, res.reason);
@@ -317,13 +468,144 @@ const onLoad = async () => {
   }
 };
 
+const togglerName = async () => {
+  if (beneficiary.length < 1) {
+    showToast({
+      message: "无数据",
+      type: "fail",
+      duration: 1000
+    });
+    return;
+  }
+  if (showBeneficiaryName.value) {
+    showBeneficiaryName.value = false;
+  } else {
+    showBeneficiaryInput.value = true;
+  }
+};
+
+const cancelDialog = () => {
+  showBeneficiaryInput.value = false;
+  password.value = "";
+};
+
+const checkOutUserPwd = async () => {
+  if (!password.value) {
+    showToast("请输入密码");
+    return;
+  }
+
+  try {
+    const username = userStore.userInfo.username;
+    const res = await loginByUsername(username, password.value);
+    const data = res.data;
+    console.log("🚀 ~ checkOutUserPwd ~ data:", data);
+  } catch (err) {
+    showToast("密码错误");
+    console.error("❌ 密码错误:", err);
+    return;
+  }
+
+  showToast("操作成功");
+  showBeneficiaryInput.value = false;
+  password.value = "";
+  showBeneficiaryName.value = true;
+  return;
+};
+
+const clickFile = async i => {
+  // 文件夹
+  if (i.type == "FOLDER") {
+    router.push({
+      path: `/files`,
+      query: {
+        path: i.name,
+        id: companyInfo.id,
+        navTitle: i.name
+      }
+    });
+  } else {
+    if (i.icon === "pdf") {
+    } else if (i.icon === "image") {
+    } else {
+      showToast("暂不支持");
+    }
+  }
+};
+
+function getFileIconName(file) {
+  let iconName;
+  if (file.type === "BACK" || file.type === "FOLDER" || file.type === "ROOT") {
+    return file.type.toLowerCase();
+  } else {
+    let fileSuffix = getFileSuffix(file.name);
+    let fileType = getFileType(file.name);
+    if (iconFileType.indexOf(fileSuffix) !== -1) {
+      iconName = fileSuffix;
+    } else if (fileType) {
+      iconName = fileType;
+    } else {
+      iconName = "file";
+    }
+  }
+  return iconName;
+}
+const fileTypeMap = {
+  image: ["gif", "jpg", "jpeg", "png", "bmp", "webp", "ico"],
+  video: ["mp4", "webm", "m3u8", "rmvb", "avi", "swf", "3gp", "mkv", "flv"],
+  audio: ["mp3", "wav", "wma", "ogg", "aac", "flac", "m4a"],
+  text: [
+    "scss",
+    "sass",
+    "kt",
+    "gitignore",
+    "bat",
+    "properties",
+    "yml",
+    "css",
+    "js",
+    "md",
+    "xml",
+    "txt",
+    "py",
+    "go",
+    "html",
+    "less",
+    "php",
+    "rb",
+    "rust",
+    "script",
+    "java",
+    "sh",
+    "sql"
+  ],
+  executable: ["exe", "dll", "com", "vbs"],
+  archive: ["7z", "zip", "rar", "tar", "gz"],
+  pdf: ["pdf"],
+  office: ["doc", "docx", "csv", "xls", "xlsx", "ppt", "pptx"],
+  three3d: ["dae", "fbx", "gltf", "glb", "obj", "ply", "stl"],
+  document: ["txt", "pages", "epub", "numbers", "keynote"]
+};
+function getFileSuffix(name) {
+  let lastIndex = name.lastIndexOf(".");
+  if (lastIndex === -1) {
+    return "other";
+  }
+  return name.substring(lastIndex + 1).toLowerCase();
+}
+function getFileType(name) {
+  let fileType;
+  for (let key in fileTypeMap) {
+    let suffix = getFileSuffix(name);
+    if (fileTypeMap[key].indexOf(suffix) !== -1) {
+      fileType = key;
+      break;
+    }
+  }
+  return fileType;
+}
 onLoad();
 </script>
-<style lang="less">
-body {
-  background-color: var(--color-background-2);
-}
-</style>
 <style lang="less" scoped>
 :root {
   --van-field-input-text-color: #333;
@@ -348,6 +630,18 @@ body {
   }
 }
 
-.list-no-data {
+:deep(.van-dialog) {
+  top: 50%;
+  width: 90%;
+}
+
+.file-list-item {
+  &__name {
+    font-size: 11px;
+  }
+
+  &__time {
+    font-size: 10px;
+  }
 }
 </style>
