@@ -127,7 +127,6 @@
             </div>
           </InfoCard>
         </van-tab>
-
         <!-- 成员 -->
         <van-tab :title="$t('detail.shareholderList')">
           <InfoCard
@@ -348,7 +347,6 @@ import { useUserStore } from "@/store/modules/user-info";
 import { loginByUsername } from "@/api/login"; // 你自己的接口路径
 import { onMounted } from "vue";
 import { iconFileType } from "./file";
-import { showImagePreview } from "vant";
 
 defineOptions({
   name: "Detail"
@@ -526,6 +524,13 @@ const clickFile = async i => {
     });
   } else {
     if (i.icon === "pdf") {
+      router.push({
+        path: `/pdfViewer`,
+        query: {
+          url: i.url,
+          navTitle: "pdf预览"
+        }
+      });
     } else if (i.icon === "image") {
     } else {
       showToast("暂不支持");

@@ -22,7 +22,7 @@ const showTabbar = computed(() => {
   return !route.meta.hiddenTabbar; // 默认值为 true，如果 meta 中未定义
 });
 // 要缓存的视图名称列表
-const cachedViews = ref(["Home", "Detail"]);
+const cachedViews = ref(["Home", "Detail", "DetailFile"]);
 // const cachedViews = ref([""]);
 </script>
 

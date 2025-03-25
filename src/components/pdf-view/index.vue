@@ -48,26 +48,22 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
-import { NavBar, Loading, Button } from "vant";
 import * as pdfjsLib from "pdfjs-dist";
+import { useRouter, useRoute } from "vue-router";
 
 // 设置 Worker
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
-const props = {
-  url: "https://vendavelnet-my.sharepoint.com/personal/welcom_wegroupltd_net/_layouts/15/download.aspx?UniqueId=f8a597b8-dc9a-408a-acf3-a72d56a84914&Translate=false&tempauth=v1.eyJzaXRlaWQiOiJlOWU1MzE0MC0wMTU1LTRiMzYtYTg5Ni1kODQ0MDUyYmM2MmEiLCJhcHBfZGlzcGxheW5hbWUiOiJ3ZS1zZXJ2aWNlcyIsImFwcGlkIjoiOGNjZjEwZjEtMTBiOC00NWI0LThmYzctODUzNmIyOTRmNDRkIiwiYXVkIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwL3ZlbmRhdmVsbmV0LW15LnNoYXJlcG9pbnQuY29tQDQwN2MxMGJhLTZhNjUtNGI2Zi1hMTdkLWYxNjE4ZThjMGVlZiIsImV4cCI6IjE3NDI4ODkwMzcifQ.CgoKBHNuaWQSAjY0EgsI9K-Mmuzc9T0QBRoOMjAuMTkwLjE0NC4xNzAqLE1lUVpZL21XNjJoNHhGOW5nT2dFVWozaWlNU0c2a0RWdFFjMGRPSG1wVGM9MJwBOAFCEKGN4-FjgABA51KdLdKy4TBKEGhhc2hlZHByb29mdG9rZW5yKTBoLmZ8bWVtYmVyc2hpcHwxMDAzMjAwM2EzN2VmZjhmQGxpdmUuY29tegEyggESCboQfEBlam9LEaF98WGOjA7vmgEGd2VsY29togEVd2VsY29tQHdlZ3JvdXBsdGQubmV0qgEQMTAwMzIwMDNBMzdFRkY4RrIBPGFsbGZpbGVzLndyaXRlIGFsbHNpdGVzLnJlYWQgYWxsc2l0ZXMud3JpdGUgYWxscHJvZmlsZXMucmVhZMgBAQ.tuKXWBw_KtDMKYhEyHayHxOFZrX9cCZyiID409llS98&ApiVersion=2.0"
-};
-
-const pdfCanvas = ref(null);
-const loading = ref(true);
 const router = useRouter();
+const route = useRoute();
 let pdfDoc = null; // PDF 文档对象
+const loading = ref(false); // 当前页码
 const currentPage = ref(1); // 当前页码
 const totalPages = ref(0); // 总页数
 const zoomLevel = ref(100); // 当前缩放比例（默认 100%）
 let scale = 1; // 当前缩放比例
+const pdfCanvas = ref(null);
 
 const onBack = () => {
   router.back();
@@ -142,12 +138,12 @@ const zoomOut = () => {
 
 onMounted(async () => {
   try {
-    if (!props.url) {
+    if (!route.query.url) {
       throw new Error("URL 为空");
     }
-    const pdfUrl = props.url.startsWith("http")
-      ? props.url
-      : `https://${props.url}`;
+    const pdfUrl = route.query.url.startsWith("http")
+      ? route.query.url
+      : `https://${route.query.url}`;
 
     pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
     totalPages.value = pdfDoc.numPages;

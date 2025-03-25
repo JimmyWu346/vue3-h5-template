@@ -57,6 +57,10 @@ import { watch } from "vue";
 import { onMounted } from "vue";
 import { iconFileType } from "./file";
 
+defineOptions({
+  name: "DetailFile"
+});
+
 onMounted(() => {
   document.body.style.backgroundColor = "#f7f8f9"; // 当前页面背景色
 });
@@ -145,7 +149,13 @@ const clickFile = async i => {
     });
   } else {
     if (i.icon === "pdf") {
-      downloadFileWithProgress(i.url);
+      router.push({
+        path: `/pdfViewer`,
+        query: {
+          url: i.url,
+          navTitle: "pdf预览"
+        }
+      });
     } else if (i.icon === "image") {
       previewShow.value = true;
       const imagesF = files.filter(f => f.icon === "image").map(f => f.url);
@@ -161,27 +171,6 @@ const clickFile = async i => {
     }
   }
 };
-function downloadFileWithProgress(url_) {
-  const xhr = new XMLHttpRequest();
-  const url = url_ || this.currentRow.url;
-  xhr.open("GET", url, true);
-  xhr.responseType = "blob"; // 處理二進製數據
-  xhr.onprogress = event => {};
-  xhr.onload = () => {
-    setTimeout(() => {
-      if (xhr.status === 200) {
-        const blob = xhr.response;
-        const blobUrl = URL.createObjectURL(blob);
-        window.open(blobUrl, "_blank");
-        URL.revokeObjectURL(blobUrl); // 釋放 Blob URL
-      }
-    }, 600);
-  };
-  xhr.onerror = () => {
-    console.error("Error downloading file");
-  };
-  xhr.send();
-}
 
 function getFileIconName(file) {
   let iconName;

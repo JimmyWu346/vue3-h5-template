@@ -49,6 +49,17 @@ const routes: Array<RouteRecordRaw> = [
           // hideNavBar: false,
           hiddenTabbar: true
         }
+      },
+      {
+        path: "pdfViewer",
+        name: "PdfViewer",
+        component: () => import("@/components/pdf-view/index.vue"),
+        meta: {
+          title: "files",
+          noCache: true,
+          hideNavBar: false,
+          hiddenTabbar: true
+        }
       }
     ]
   },
