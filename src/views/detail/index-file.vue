@@ -1,8 +1,8 @@
 <template>
   <van-pull-refresh v-model="pullLoading" @refresh="pullOnLoad">
-    <van-loading v-if="loading" size="24px" class="text-center mt-[40%]"
-      >加载中...</van-loading
-    >
+    <van-loading v-if="loading" size="24px" class="text-center mt-[40%]">{{
+      $t("detail.loading")
+    }}</van-loading>
     <!--  mt-[64px] -->
     <div
       v-if="!loading"
@@ -31,7 +31,7 @@
           v-if="files.length < 1"
           class="text-[#646A73] text-[11px] text-center"
         >
-          无数据
+          {{ $t("detail.noData") }}
         </p>
       </InfoCard>
     </div>
@@ -126,11 +126,11 @@ const onLoad = async () => {
             break;
         }
       } else {
-        console.error(`❌ 第 ${index + 1} 个请求失败:`, res.reason);
+        console.error(`❌ ${t("detail.requestFailed")}:`, res.reason);
       }
     });
   } catch (e) {
-    console.error("❌ 请求过程中发生错误:", e);
+    console.error(`❌ ${t("detail.requestError")}:`, e);
   } finally {
     loading.value = false;
   }
@@ -153,7 +153,7 @@ const clickFile = async i => {
         path: `/pdfViewer`,
         query: {
           url: i.url,
-          navTitle: "pdf预览"
+          navTitle: t("detail.pdfPreview")
         }
       });
     } else if (i.icon === "image") {
@@ -167,7 +167,7 @@ const clickFile = async i => {
           f => f.icon === "image" && f.name === i.name && f.url === i.url
         );
     } else {
-      showToast("暂不支持");
+      showToast(t("detail.notSupported"));
     }
   }
 };

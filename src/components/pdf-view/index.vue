@@ -1,13 +1,15 @@
 <template>
   <div class="pdf-preview">
     <van-nav-bar
-      :title="`PDF预览 (${currentPage}/${totalPages})`"
+      :title="$t('detail.pdf.preview')"
       left-arrow
       @click-left="onBack"
     />
     <div class="pdf-container">
       <canvas ref="pdfCanvas" />
-      <van-loading v-if="loading" size="24px" vertical>加载中...</van-loading>
+      <van-loading v-if="loading" size="24px" vertical>{{
+        $t("detail.pdf.loading")
+      }}</van-loading>
     </div>
     <div class="pagination !pb-[35px]">
       <div>
@@ -29,7 +31,7 @@
           class="!h-[30px]"
           @click="prevPage"
         >
-          上一页
+          {{ $t("detail.pdf.prevPage") }}
         </van-button>
         <span>{{ currentPage }} / {{ totalPages }}</span>
         <van-button
@@ -39,7 +41,7 @@
           class="!h-[30px]"
           @click="nextPage"
         >
-          下一页
+          {{ $t("detail.pdf.nextPage") }}
         </van-button>
       </div>
     </div>
@@ -50,6 +52,9 @@
 import { ref, onMounted } from "vue";
 import * as pdfjsLib from "pdfjs-dist";
 import { useRouter, useRoute } from "vue-router";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 // 设置 Worker
 pdfjsLib.GlobalWorkerOptions.workerSrc =
@@ -97,7 +102,7 @@ const renderPage = async pageNum => {
     await page.render(renderContext).promise;
     loading.value = false;
   } catch (error) {
-    console.error("页面渲染失败:", error);
+    console.error(t("detail.pdf.renderFailed") + ":", error);
     loading.value = false;
   }
 };
@@ -139,7 +144,7 @@ const zoomOut = () => {
 onMounted(async () => {
   try {
     if (!route.query.url) {
-      throw new Error("URL 为空");
+      throw new Error(t("detail.pdf.urlEmpty"));
     }
     const pdfUrl = route.query.url.startsWith("http")
       ? route.query.url
@@ -150,7 +155,7 @@ onMounted(async () => {
     currentPage.value = 1;
     await renderPage(currentPage.value);
   } catch (error) {
-    console.error("PDF 加载失败:", error);
+    console.error(t("detail.pdf.loadFailed") + ":", error);
     loading.value = false;
   }
 });

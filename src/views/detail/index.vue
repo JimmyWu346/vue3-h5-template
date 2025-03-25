@@ -1,8 +1,8 @@
 <template>
   <van-pull-refresh v-model="pullLoading" @refresh="pullOnLoad">
-    <van-loading v-if="loading" size="24px" class="text-center mt-[40%]"
-      >加载中...</van-loading
-    >
+    <van-loading v-if="loading" size="24px" class="text-center mt-[40%]">{{
+      $t("detail.loading")
+    }}</van-loading>
     <!--  mt-[64px] -->
     <div
       v-if="!loading"
@@ -11,7 +11,7 @@
       <!-- 主体内容 -->
       <van-tabs v-model:active="active" swipeable>
         <!-- 基本信息 -->
-        <van-tab :title="$t('detail.basicInfo')">
+        <van-tab v-if="sys_company_info_get" :title="$t('detail.basicInfo')">
           <InfoCard
             class="mt-1"
             :title="$t('detail.basicInfo')"
@@ -102,7 +102,10 @@
         </van-tab>
 
         <!-- 附件 -->
-        <van-tab :title="$t('detail.attachmentList')">
+        <van-tab
+          v-if="sys_company_files_get"
+          :title="$t('detail.attachmentList')"
+        >
           <InfoCard
             class="mt-1"
             :title="$t('detail.attachmentList')"
@@ -130,13 +133,17 @@
         <!-- 成员 -->
         <van-tab :title="$t('detail.shareholderList')">
           <InfoCard
-            class="mt-1 pb-2"
-            title="股东/成员列表"
+            class="mt-[4px] pb-[8px]"
+            :title="$t('detail.shareholderTitle')"
             :icon="shareholderImg"
-            noDividersdfs
+            noDivider
           >
             <!-- 股東/成員列表 -->
-            <InfoCardSub title="股東/成員列表">
+            <div class="mt-[8px]" />
+            <InfoCardSub
+              v-if="sys_company_shareholder_get"
+              :title="$t('detail.shareholderTitle')"
+            >
               <van-row :gutter="[10, 10]">
                 <van-col
                   v-for="(i, k) in shareholder"
@@ -145,27 +152,30 @@
                   class="!mb-[10px]"
                 >
                   <TextCardNotText class="grid grid-cols-[65%_35%] gap-[7px]">
-                    <TextCardNotText_Text title="股東名稱" :content="i.name" />
                     <TextCardNotText_Text
-                      title="類別"
+                      :title="$t('detail.shareholderName')"
+                      :content="i.name"
+                    />
+                    <TextCardNotText_Text
+                      :title="$t('detail.category')"
                       :content="i.categoryStr"
                     />
 
                     <TextCardNotText_Text
-                      title="股份百分比"
+                      :title="$t('detail.sharePercentage')"
                       :content="String(i.sharePercentage) + '%'"
                     />
                     <TextCardNotText_Text
-                      title="股数"
+                      :title="$t('detail.shareCount')"
                       :content="i.shareCount"
                     />
 
                     <TextCardNotText_Text
-                      title="Capital/contribution"
+                      :title="$t('detail.capitalContribution')"
                       :content="i.capitalContribution"
                     />
                     <TextCardNotText_Text
-                      title="日期"
+                      :title="$t('detail.date')"
                       :content="i.jobDate && i.jobDate.slice(0, 10)"
                     />
                   </TextCardNotText>
@@ -177,14 +187,17 @@
                     v-if="shareholder.length < 1"
                     class="text-[#646A73] text-[11px] text-center"
                   >
-                    无数据
+                    {{ $t("detail.noData") }}
                   </p>
                 </van-col>
               </van-row></InfoCardSub
             >
 
             <!-- 董事列表 -->
-            <InfoCardSub title="董事列表">
+            <InfoCardSub
+              v-if="sys_company_director_get"
+              :title="$t('detail.directorTitle')"
+            >
               <van-row :gutter="[10, 10]">
                 <van-col
                   v-for="(i, k) in director"
@@ -193,14 +206,21 @@
                   span="24"
                 >
                   <TextCardNotText class="grid grid-cols-[65%_35%] gap-[7px]">
-                    <TextCardNotText_Text title="姓名" :content="i.name" />
                     <TextCardNotText_Text
-                      title="状态"
-                      :content="i.status == 1 ? '在职' : '离职'"
+                      :title="$t('detail.name')"
+                      :content="i.name"
+                    />
+                    <TextCardNotText_Text
+                      :title="$t('detail.status')"
+                      :content="
+                        i.status == 1
+                          ? $t('detail.active')
+                          : $t('detail.inactive')
+                      "
                     />
 
                     <TextCardNotText_Text
-                      title="日期"
+                      :title="$t('detail.date')"
                       :content="i.jobDate && i.jobDate.slice(0, 10)"
                     />
                   </TextCardNotText>
@@ -212,23 +232,29 @@
                     v-if="shareholder.length < 1"
                     class="text-[#646A73] text-[11px] text-center"
                   >
-                    无数据
+                    {{ $t("detail.noData") }}
                   </p>
                 </van-col>
               </van-row>
             </InfoCardSub>
 
             <!-- 授權代表 -->
-            <InfoCardSub title="授權代表">
+            <InfoCardSub
+              v-if="sys_company_authorized_get"
+              :title="$t('detail.authorizedTitle')"
+            >
               <van-row :gutter="[10, 10]">
                 <van-col
-                  v-for="(i, k) in director"
+                  v-for="(i, k) in authorized"
                   :key="k"
                   class="!mb-[10px]"
                   span="24"
                 >
                   <TextCardNotText class="grid grid-cols-[100%_35%] gap-[7px]">
-                    <TextCardNotText_Text title="姓名" :content="i.name" />
+                    <TextCardNotText_Text
+                      :title="$t('detail.name')"
+                      :content="i.name"
+                    />
                   </TextCardNotText>
                 </van-col>
 
@@ -238,14 +264,17 @@
                     v-if="shareholder.length < 1"
                     class="text-[#646A73] text-[11px] text-center"
                   >
-                    无数据
+                    {{ $t("detail.noData") }}
                   </p>
                 </van-col>
               </van-row>
             </InfoCardSub>
 
             <!-- 最終受益人 -->
-            <InfoCardSub title="最終受益人">
+            <InfoCardSub
+              v-if="sys_company_beneficiary_get"
+              :title="$t('detail.beneficiaryTitle')"
+            >
               <template #title-right>
                 <div class="ml-[2px]" @click="togglerName">
                   <img
@@ -269,7 +298,7 @@
                 >
                   <TextCardNotText class="grid grid-cols-[100%_35%] gap-[7px]">
                     <TextCardNotText_Text
-                      title="姓名"
+                      :title="$t('detail.name')"
                       :content="showBeneficiaryName ? i.name : '****'"
                     />
                   </TextCardNotText>
@@ -280,7 +309,7 @@
                     v-if="shareholder.length < 1"
                     class="text-[#646A73] text-[11px] text-center"
                   >
-                    无数据
+                    {{ $t("detail.noData") }}
                   </p>
                 </van-col>
               </van-row>
@@ -292,7 +321,7 @@
       <van-dialog
         v-if="showBeneficiaryInput"
         v-model:show="showBeneficiaryInput"
-        title="确认密码"
+        :title="$t('detail.confirmPassword')"
         show-cancel-button
         show-confirm-button
         confirmButtonColor="#"
@@ -312,7 +341,7 @@
               type="primary !border-0 "
               color="gray"
               @click="cancelDialog"
-              >取消</van-button
+              >{{ $t("detail.cancel") }}</van-button
             >
             <van-button
               block
@@ -320,7 +349,7 @@
               type="success !border-0 "
               color="#ff5733"
               @click="checkOutUserPwd"
-              >确认</van-button
+              >{{ $t("detail.confirm") }}</van-button
             >
           </div>
         </template>
@@ -331,7 +360,7 @@
 
 <script setup>
 import { useRouter, useRoute } from "vue-router";
-import { reactive, ref } from "vue";
+import { reactive, ref, computed } from "vue";
 import InfoCard from "@/components/info-card/index.vue";
 import InfoCardSub from "@/components/info-card/index-sub.vue";
 import TextCardNotText from "@/components/text-card/index-not-text.vue";
@@ -354,6 +383,31 @@ defineOptions({
 
 onMounted(() => {
   document.body.style.backgroundColor = "#f7f8f9"; // 当前页面背景色
+});
+
+// 基本信息
+const sys_company_info_get = computed(() => {
+  return userStore.permissions.includes("sys_company_info_get"); // 根据实际的权限标识修改
+});
+// 最终受益人列表
+const sys_company_beneficiary_get = computed(() => {
+  return userStore.permissions.includes("sys_company_beneficiary_get"); // 根据实际的权限标识修改
+});
+// 授权列表
+const sys_company_authorized_get = computed(() => {
+  return userStore.permissions.includes("sys_company_authorized_get"); // 根据实际的权限标识修改
+});
+// 董事列表
+const sys_company_director_get = computed(() => {
+  return userStore.permissions.includes("sys_company_director_get"); // 根据实际的权限标识修改
+});
+// 股东成员列表
+const sys_company_shareholder_get = computed(() => {
+  return userStore.permissions.includes("sys_company_shareholder_get"); // 根据实际的权限标识修改
+});
+// 附件列表
+const sys_company_files_get = computed(() => {
+  return userStore.permissions.includes("sys_company_files_get"); // 根据实际的权限标识修改
 });
 
 const { t } = useI18n();
@@ -469,7 +523,7 @@ const onLoad = async () => {
 const togglerName = async () => {
   if (beneficiary.length < 1) {
     showToast({
-      message: "无数据",
+      message: t("detail.noData"),
       type: "fail",
       duration: 1000
     });
@@ -489,7 +543,7 @@ const cancelDialog = () => {
 
 const checkOutUserPwd = async () => {
   if (!password.value) {
-    showToast("请输入密码");
+    showToast(t("placeHolderPwd"));
     return;
   }
 
@@ -499,12 +553,12 @@ const checkOutUserPwd = async () => {
     const data = res.data;
     console.log("🚀 ~ checkOutUserPwd ~ data:", data);
   } catch (err) {
-    showToast("密码错误");
+    showToast(t("detail.passwordError"));
     console.error("❌ 密码错误:", err);
     return;
   }
 
-  showToast("操作成功");
+  showToast(t("showSuccessToast"));
   showBeneficiaryInput.value = false;
   password.value = "";
   showBeneficiaryName.value = true;
