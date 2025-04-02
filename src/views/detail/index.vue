@@ -114,20 +114,30 @@
             <div
               v-for="(i, k) in files"
               :key="k"
-              class="flex justify-between items-center file-list-item"
+              class="flex justify-between items-center file-list-item py-[4px]"
               @click="clickFile(i)"
             >
-              <div class="w-[calc(100%-83px-20px)] flex items-center">
+              <div class="w-[calc(100%-100px-20px)] flex items-center">
                 <FileIcon :fileName="i.name" :icon="i.icon" />
                 <span
                   class="w-[calc(100%-28px)] truncate text-[#646A73FF] file-list-item__name ml-[3px]"
                   >{{ i.name }}</span
                 >
               </div>
-              <div class="w-[83px] text-[#A6A6A6] file-list-item__time">
+              <div class="w-[100px] text-[#A6A6A6] file-list-item__time">
                 {{ i.time && i.time.substring(0, 16) }}
               </div>
             </div>
+
+            <!-- 无数据 -->
+            <van-col span="24">
+              <p
+                v-if="files.length < 1"
+                class="text-[#646A73] text-[11px] text-center"
+              >
+                {{ $t("detail.noData") }}
+              </p>
+            </van-col>
           </InfoCard>
         </van-tab>
         <!-- 成员 -->
@@ -155,10 +165,8 @@
                     <TextCardNotText_Text
                       :title="$t('detail.shareholderName')"
                       :content="i.name"
-                    />
-                    <TextCardNotText_Text
-                      :title="$t('detail.category')"
-                      :content="i.categoryStr"
+                      :noTruncate="true"
+                      class="col-span-2"
                     />
 
                     <TextCardNotText_Text
@@ -177,6 +185,10 @@
                     <TextCardNotText_Text
                       :title="$t('detail.date')"
                       :content="i.jobDate && i.jobDate.slice(0, 10)"
+                    />
+                    <TextCardNotText_Text
+                      :title="$t('detail.category')"
+                      :content="i.categoryStr"
                     />
                   </TextCardNotText>
                 </van-col>
@@ -359,8 +371,8 @@
 </template>
 
 <script setup>
-import { useRouter, useRoute } from "vue-router";
-import { reactive, ref, computed } from "vue";
+import { useRouter, useRoute, onBeforeRouteLeave } from "vue-router";
+import { reactive, ref, computed, watch } from "vue";
 import InfoCard from "@/components/info-card/index.vue";
 import InfoCardSub from "@/components/info-card/index-sub.vue";
 import TextCardNotText from "@/components/text-card/index-not-text.vue";
@@ -383,6 +395,14 @@ defineOptions({
 
 onMounted(() => {
   document.body.style.backgroundColor = "#f7f8f9"; // 当前页面背景色
+});
+
+onBeforeRouteLeave((to, from, next) => {
+  // 判断即将离开的页面是否是 "xxx" 路径
+  if (to.name !== "Files" && to.name !== "PdfViewer") {
+    active.value = 0;
+  }
+  next();
 });
 
 // 基本信息
@@ -421,7 +441,6 @@ const showBeneficiaryName = ref(false);
 const showBeneficiaryInput = ref(false);
 const password = ref("");
 const showPassword = ref(false);
-const id = route.query.id;
 
 const companyInfo = reactive({});
 // 成员
@@ -445,18 +464,21 @@ const onLoad = async () => {
   loading.value = true;
 
   const requests = [
-    http.request({ url: `/company/${id}`, method: "get" }),
-    http.request({ url: `/shareholder/list?companyId=${id}`, method: "get" }),
+    http.request({ url: `/company/${route.query.id}`, method: "get" }),
     http.request({
-      url: `/company/director/list?companyId=${id}`,
+      url: `/shareholder/list?companyId=${route.query.id}`,
       method: "get"
     }),
     http.request({
-      url: `/company/authorized-representative/list?companyId=${id}`,
+      url: `/company/director/list?companyId=${route.query.id}`,
       method: "get"
     }),
     http.request({
-      url: `/company/beneficiary/list?companyId=${id}`,
+      url: `/company/authorized-representative/list?companyId=${route.query.id}`,
+      method: "get"
+    }),
+    http.request({
+      url: `/company/beneficiary/list?companyId=${route.query.id}`,
       method: "get"
     }),
     http.request({
@@ -465,7 +487,7 @@ const onLoad = async () => {
       data: {
         storageKey: "1",
         password: "",
-        companyId: id,
+        companyId: route.query.id,
         orderBy: "name",
         orderDirection: "asc"
       }
@@ -485,19 +507,19 @@ const onLoad = async () => {
             break;
           case 1:
             shareholder.splice(0, shareholder.length, ...data);
-            console.log("✅ shareholder:", data);
+            // console.log("✅ shareholder:", data);
             break;
           case 2:
             director.splice(0, director.length, ...data);
-            console.log("✅ director:", data);
+            // console.log("✅ director:", data);
             break;
           case 3:
             authorized.splice(0, authorized.length, ...data);
-            console.log("✅ authorized:", data);
+            // console.log("✅ authorized:", data);
             break;
           case 4:
             beneficiary.splice(0, beneficiary.length, ...data);
-            console.log("✅ beneficiary:", data);
+            // console.log("✅ beneficiary:", data);
             break;
           case 5:
             files.splice(0, files.length, ...data.files);
@@ -506,7 +528,7 @@ const onLoad = async () => {
               item["icon"] = getFileIconName(item);
             });
 
-            console.log("✅ files:", data);
+            // console.log("✅ files:", data);
             break;
         }
       } else {
@@ -663,6 +685,17 @@ function getFileType(name) {
   }
   return fileType;
 }
+
+// 监听路由参数中的 id 变化
+watch(
+  () => route.query.id,
+  (newId, oldId) => {
+    if (newId !== oldId) {
+      newId && onLoad(); // 根据新的 id 重新加载数据
+    }
+  }
+);
+
 onLoad();
 </script>
 <style lang="less" scoped>

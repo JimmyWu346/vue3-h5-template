@@ -1,5 +1,5 @@
 <template>
-  <div class="pt-[15px] px-[12px] pb-[20px] info-container">
+  <div class="pt-[15px] px-[12px] pb-[12px] info-container">
     <!-- 标题 -->
     <div class="flex items-center">
       <img v-if="icon" :src="icon" class="w-[22px] h-[22px]" />

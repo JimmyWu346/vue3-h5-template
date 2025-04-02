@@ -24,8 +24,8 @@ export default {
   // 詳情頁翻譯
   detail: {
     basicInfo: "公司基本信息",
-    attachmentList: "附件列錶",
-    shareholderList: "股東列錶",
+    attachmentList: "附件列表",
+    shareholderList: "股東列表",
     companyEnName: "公司英文名",
     companyChName: "公司中文名",
     companyAbbr: "公司簡稱",
@@ -39,8 +39,8 @@ export default {
     registerOffice: "註冊辦公室",
     loading: "加載中...",
     noData: "無數據",
-    shareholderTitle: "股東/成員列錶",
-    directorTitle: "董事列錶",
+    shareholderTitle: "股東/成員列表",
+    directorTitle: "董事列表",
     authorizedTitle: "授權代表",
     beneficiaryTitle: "最終受益人",
     shareholderName: "股東名稱",

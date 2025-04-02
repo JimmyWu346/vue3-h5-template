@@ -42,7 +42,7 @@
                 <span v-if="item.jurisdictionArea && item.typeStr">{{
                   "&nbsp;|&nbsp;"
                 }}</span>
-                <van-text-ellipsis :content="item.typeStr" />
+                <div class="truncate">{{ item.typeStr }}</div>
               </div>
             </div>
             <!-- 右 -->

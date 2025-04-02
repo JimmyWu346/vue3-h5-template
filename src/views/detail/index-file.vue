@@ -12,17 +12,19 @@
         <div
           v-for="(i, k) in files"
           :key="k"
-          class="flex justify-between items-center file-list-item"
+          class="flex justify-between items-center file-list-item py-[4px]"
           @click="clickFile(i)"
         >
-          <div class="w-[calc(100%-83px-20px)] flex items-center">
+          <!-- 文件名称 -->
+          <div class="w-[calc(100%-100px-20px)] flex items-center">
             <FileIcon :fileName="i.name" :icon="i.icon" />
             <span
               class="w-[calc(100%-28px)] truncate text-[#646A73FF] file-list-item__name ml-[3px]"
               >{{ i.name }}</span
             >
           </div>
-          <div class="w-[83px] text-[#A6A6A6] file-list-item__time">
+          <!-- 时间 -->
+          <div class="w-[100px] text-[#A6A6A6] file-list-item__time">
             {{ i.time && i.time.substring(0, 16) }}
           </div>
         </div>
