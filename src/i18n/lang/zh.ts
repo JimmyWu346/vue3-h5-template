@@ -47,7 +47,7 @@ export default {
     category: "類別",
     sharePercentage: "股份百分比",
     shareCount: "股數",
-    capitalContribution: "Capital/contribution",
+    capitalContribution: "股本/出资",
     date: "日期",
     name: "姓名",
     status: "狀態",

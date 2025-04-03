@@ -37,12 +37,17 @@
             <!-- 左 -->
             <div class="left">
               <van-text-ellipsis :content="item.abbreviation" class="left-t" />
-              <div class="flex left-b">
+              <div class="flex left-b overflow-hidden">
                 <van-text-ellipsis :content="item.jurisdictionArea" />
                 <span v-if="item.jurisdictionArea && item.typeStr">{{
                   "&nbsp;|&nbsp;"
                 }}</span>
-                <div class="truncate">{{ item.typeStr }}</div>
+                <div
+                  class="truncate"
+                  style="line-height: var(--van-text-ellipsis-line-height)"
+                >
+                  {{ item.typeStr }}
+                </div>
               </div>
             </div>
             <!-- 右 -->

@@ -161,7 +161,7 @@
                   span="24"
                   class="!mb-[10px]"
                 >
-                  <TextCardNotText class="grid grid-cols-[65%_35%] gap-[7px]">
+                  <TextCardNotText class="grid grid-cols-[60%_40%] gap-[7px]">
                     <TextCardNotText_Text
                       :title="$t('detail.shareholderName')"
                       :content="i.name"
@@ -189,6 +189,7 @@
                     <TextCardNotText_Text
                       :title="$t('detail.category')"
                       :content="i.categoryStr"
+                      class="col-span-2"
                     />
                   </TextCardNotText>
                 </van-col>
